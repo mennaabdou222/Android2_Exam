@@ -2,12 +2,14 @@ package com.example.android2exam;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -62,19 +64,31 @@ public class MainActivity extends AppCompatActivity {
                     ModeActivity.class);
             startActivity(intent);
         });
-    }
 
-    @Override
-    public void onBackPressed() {
+        getOnBackPressedDispatcher().addCallback(this,
+                new OnBackPressedCallback(true) {
 
-        if (System.currentTimeMillis() - backPressedTime < 3000) {
-            finishAffinity();
-        } else {
-            Snackbar.make(findViewById(R.id.main_layout),
-                    "Press back again to exit",
-                    Snackbar.LENGTH_LONG).show();
+            @Override
+            public void handleOnBackPressed() {
 
-            backPressedTime = System.currentTimeMillis();
-        }
+                long currentTime = SystemClock.elapsedRealtime();
+
+                if (backPressedTime != 0 &&
+                    currentTime - backPressedTime < 3000) {
+
+                    finishAffinity();
+
+                } else {
+
+                    backPressedTime = currentTime;
+
+                    Snackbar.make(
+                        findViewById(R.id.main_layout),
+                        "Press back again to exit",
+                        3000
+                    ).show();
+                }
+            }
+        });
     }
 }
